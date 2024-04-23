@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"time"
 )
 
@@ -84,78 +83,6 @@ type CaloriesCalculator interface {
 	TrainingInfo() InfoMessage
 }
 
-// Константы для расчета потраченных килокалорий при беге.
-const (
-	CaloriesMeanSpeedMultiplier = 18   // множитель средней скорости бега
-	CaloriesMeanSpeedShift      = 1.79 // коэффициент изменения средней скорости
-)
-
-// Running структура, описывающая тренировку Бег.
-type Running struct {
-	// добавьте необходимые поля в структуру
-	Training
-}
-
-// Calories возввращает количество потраченных килокалория при беге.
-// Формула расчета:
-// ((18 * средняя_скорость_в_км/ч + 1.79) * вес_спортсмена_в_кг / м_в_км * время_тренировки_в_часах * мин_в_часе)
-// Это переопределенный метод Calories() из Training.
-func (r Running) Calories() float64 {
-	// вставьте ваш код ниже
-	return ((CaloriesMeanSpeedMultiplier*r.Training.meanSpeed() + CaloriesMeanSpeedShift) * r.Weight / MInKm * r.Training.Duration.Hours() * MinInHours)
-}
-
-// TrainingInfo возвращает структуру InfoMessage с информацией о проведенной тренировке.
-// Это переопределенный метод TrainingInfo() из Training.
-func (r Running) TrainingInfo() InfoMessage {
-	// вставьте ваш код ниже
-	return InfoMessage{
-		TrainingType: r.TrainingType,
-		Duration:     r.Duration,
-		Distance:     r.distance(),
-		Speed:        r.meanSpeed(),
-		Calories:     r.Calories(),
-	}
-}
-
-// Константы для расчета потраченных килокалорий при ходьбе.
-const (
-	CaloriesWeightMultiplier      = 0.035 // коэффициент для веса
-	CaloriesSpeedHeightMultiplier = 0.029 // коэффициент для роста
-	KmHInMsec                     = 0.278 // коэффициент для перевода км/ч в м/с
-)
-
-// Walking структура описывающая тренировку Ходьба
-type Walking struct {
-	// добавьте необходимые поля в структуру
-	Training
-	Height float64 // рост пользователя
-}
-
-// Calories возвращает количество потраченных килокалорий при ходьбе.
-// Формула расчета:
-// ((0.035 * вес_спортсмена_в_кг + (средняя_скорость_в_метрах_в_секунду**2 / рост_в_метрах)
-// * 0.029 * вес_спортсмена_в_кг) * время_тренировки_в_часах * мин_в_ч)
-// Это переопределенный метод Calories() из Training.
-func (w Walking) Calories() float64 {
-	// вставьте ваш код ниже
-	SpeedInMS := w.meanSpeed() * 1000 / 3600
-	return ((CaloriesWeightMultiplier*w.Training.Weight + (math.Pow(SpeedInMS, 2)/w.Height)*CaloriesSpeedHeightMultiplier*w.Training.Weight) * w.Training.Duration.Hours() * MinInHours)
-}
-
-// TrainingInfo возвращает структуру InfoMessage с информацией о проведенной тренировке.
-// Это переопределенный метод TrainingInfo() из Training.
-func (w Walking) TrainingInfo() InfoMessage {
-	// вставьте ваш код ниже
-	return InfoMessage{
-		TrainingType: w.TrainingType,
-		Duration:     w.Duration,
-		Distance:     w.distance(),
-		Speed:        w.meanSpeed(),
-		Calories:     w.Calories(),
-	}
-}
-
 // Константы для расчета потраченных килокалорий при плавании.
 const (
 	SwimmingLenStep                  = 1.38 // длина одного гребка
@@ -228,30 +155,5 @@ func main() {
 	}
 
 	fmt.Println(ReadData(swimming))
-
-	walking := Walking{
-		Training: Training{
-			TrainingType: "Ходьба",
-			Action:       20000,
-			LenStep:      LenStep,
-			Duration:     3*time.Hour + 45*time.Minute,
-			Weight:       85,
-		},
-		Height: 185,
-	}
-
-	fmt.Println(ReadData(walking))
-
-	running := Running{
-		Training: Training{
-			TrainingType: "Бег",
-			Action:       5000,
-			LenStep:      LenStep,
-			Duration:     30 * time.Minute,
-			Weight:       85,
-		},
-	}
-
-	fmt.Println(ReadData(running))
 
 }
